@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+	<meta charset="UTF-8">
+	<title>AJAX E VUEJS</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+</head>
+
+<style>
+
+</style>
+
+<body>
+
+	<div id="app" class="container txt-center">
+		<div class="jumbotron">
+			<h1 class="display-1">Ajax e VueJs</h1>
+			<button @click.stop.prevent= "getUsers()" class=" btn btn-success btn-lg ">Carregar usuarios</button>
+		</div>
+	
+		<section>
+			<div class="row">
+				<div v-for="post in posts" class="col-md-4">
+					<div  class="card text-white bg-dark my-2" style="min-height: 350px;" >
+						<div class="card-header">POST VIA AJAX</div>
+						<div class="card-body">
+							<h5 class="card-title">{{post.title}}</h5>
+							<p class="card-text">{{post.body}}</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</section>
+
+		<span v-if="response.status == 'error'" class="alert alert-danger"> {{response.msg}}</span>
+
+		<div v-if ="loader.posts" class="loader"></div>
+	</div>
+
+
+
+
+
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+	<script>
+		var mixin = {
+			methods: {
+				getUsers(){
+					this.loader.posts = true;
+					var url = 'https://jsonplaceholder.typicode.com/posts';
+					// quando essa requisicao terminar, entao vamos realizar uma ação
+					this.$http.get(url).then(function(response){
+						this.posts = response.body;
+					}, function(err){
+						console.log("Deu o seguinte erro:");
+						console.log(err);
+						this.response.status = "error";
+					})
+					.finally(function(){
+						this.loader.posts = false;
+					});
+				}
+			}
+		}
+		var app =  new Vue({
+			el:"#app",
+			mixins: [mixin],
+			data: {
+				titulo: "Vue js com AJAX",
+				posts: [],
+				loader: {
+					posts:false,
+				},
+				response: {
+					msg: "Erro ao conectar, tente novamente mais tarde.",
+					status: ""
+				}
+			}
+		});
+	</script>
+
+</body>
+</html>
+
